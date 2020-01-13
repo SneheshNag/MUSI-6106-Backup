@@ -32,11 +32,12 @@ int main(int argc, char* argv[])
     showClInfo();
 
     //////////////////////////////////////////////////////////////////////////////
-    // parse command line arguments
+    sInputFilePath = argv[1];
+    sOutputFilePath = argv[2];
  
     //////////////////////////////////////////////////////////////////////////////
-    // open the input wave file
- 
+    CAudioFileIf::create(phAudioFile);
+    phAudioFile->openFile(sInputFilePath, CAudioFileIf::FileIoType_t::kFileRead, &stFileSpec); 
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
  
