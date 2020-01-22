@@ -34,7 +34,7 @@ CombFilter::~CombFilter()     // Destructor for filterAudio //
 }
 
 /* A method to perform FIR and IIR comb filtering of an input block using the coefficients defined when constructing the filterAudio object. */
-float ** CombFilter::combFilterBlock(float **fInput, int iBlockSize, int Num_chans){
+float ** CombFilter::combFilterBlock(float **fInput, int BlockSize, int Num_chans){
     
     // Allocate memory for output
     float **fOutput = new float *[Num_chans];
@@ -75,7 +75,7 @@ void CombFilter::clearDelayLines(){     //clear the multichannel delay lines
     }
 }
 
-int CombFilter::getDelayInSamples() const{  //return the number of samples in the delay line
+int CombFilter::getSampleDelay() const{  //return the number of samples in the delay line
     return SampleDelay;
 }
 
