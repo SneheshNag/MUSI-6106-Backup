@@ -23,6 +23,12 @@ int main(int argc, char* argv[])
     static const int        kBlockSize = 1024;
 
     clock_t                 time = 0;
+    float FIR_Coeff = 0.0;
+    float IIR_Coeff = 0.0;
+    float Delay = 0.0;
+    int iBlockSize = 2048; //default blockSize
+    bool bOutputResultToTextFile = false; //default
+    int iFileOpenStatus;
 
     float                   **ppfAudioData = 0;
 
@@ -34,16 +40,15 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
-    if (argc < 2)
-    {
-        cout << "Missing audio input path!";
-        return -1;
-    }
-    else
-    {
+    if( argc == 7 || argc == 8) {
+        //File path and name
         sInputFilePath = argv[1];
-        sOutputFilePath = sInputFilePath + ".txt";
-    }
+        sInputFileName = argv[2];
+
+        //Gain
+        FIR_Coeff = atof(argv[3]);
+        IIR_Coeff = atof(argv[4]);
+
 
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
@@ -93,6 +98,58 @@ int main(int argc, char* argv[])
 
     cout << "\nreading/writing done in: \t" << (clock() - time)*1.F / CLOCKS_PER_SEC << " seconds." << endl;
 
+        
+        
+    int testZeroInput() {
+        FilterAudio *pFilter;
+        float fFIRCoeff = 1.0;
+        float fIIRCoeff = 0.5;
+        int iDelayInSamples = 10;
+        int iNumChannels = 1;
+        int iBlockSize = 1024;
+        int iNumBlocks = 50; //Length of sample is 50 blocks
+
+        //Allocate memory
+        float **ppfAudioData = new float *[iNumChannels];
+        for (int n=0; n<iNumChannels; n++) {
+            ppfAudioData[n] = new float[iBlockSize];
+            for (int m=0; m<iBlockSize; m++) {
+                ppfAudioData[n][m] = 0; //Initialize all samples to zero
+            }
+        }
+    
+        pFilter = new FilterAudio(fFIRCoeff, fIIRCoeff, iDelayInSamples, iNumChannels);
+
+        while (iNumBlocks > 0) {
+
+            //Get filtered data
+            ppfAudioData = pFilter->combFilterBlock(ppfAudioData, iBlockSize, iNumChannels);
+
+            for (int n=0; n<iNumChannels; n++) {
+                for (int m=0; m<iBlockSize; m++) {
+
+                    //Check if all the values are 0
+                    if (abs(ppfAudioData[n][m]) > 0.001) {
+                        cout<<"\nZero Input Test: failed!\n";
+                        return -1;
+                    }
+                }
+            }
+            iNumBlocks--;
+        }
+
+    cout<<"\nZero Input Test: Success!\n";
+    
+        //Free memory
+        delete pFilter;
+        pFilter = 0;
+        for (int n=0; n<iNumChannels; n++) {
+            delete [] ppfAudioData[n];
+        }
+        delete ppfAudioData;
+    
+    return 0;
+}
     //////////////////////////////////////////////////////////////////////////////
     // clean-up
     CAudioFileIf::destroy(phAudioFile);
