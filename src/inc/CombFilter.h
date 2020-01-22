@@ -1,29 +1,27 @@
-#ifndef FilterAudio_hpp
-#define FilterAudio_hpp
 
 #include <stdio.h>
 
 
-class FilterAudio {
+class CombFilter {
 public:
-    FilterAudio(float fFIRCoeff, float fIIRCoeff, int iDelayInSamples, int iNumChannels); // Constructor
-    ~FilterAudio();
+    CombFilter(float FIR_Coeff, float IIR_Coeff, int SampleDelay, int Num_chans); // Constructor
+    ~CombFilter();
     
-    float **combFilterBlock(float **input, int blockSize, int numChannels);
+    float **combFilterBlock(float **input, int blockSize, int Num_chans);
 
     void clearDelayLines();
     
-    int getDelayInSamples() const;
+    int getSampleDelay() const;
     float getFIRCoeff() const;
     float getIIRCoeff() const;
 
 private:
-    float fFIRCoeff;
-    float fIIRCoeff;
-    int iDelayInSamples;
-    int iNumChannels;
-    float **fFIRDelay;
-    float **fIIRDelay;
+    float FIRCoeff;
+    float IIRCoeff;
+    int SampleDelay;
+    int Num_chans;
+    float **FIR_Delay;
+    float **IIR_Delay;
 };
 
-#endif /* FilterAudio_h */
+#endif /* CombFilter */
