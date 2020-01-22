@@ -2,61 +2,61 @@
 #include <iostream>
 
 /* The constructor method for FilterAudio */
-FilterAudio::FilterAudio(float fFIRCoeff, float fIIRCoeff, int iDelayInSamples, int iNumChannels) {
+FilterAudio::FilterAudio(float FIR_Coeff, float IIR_Coeff, int SampleDelay, int Num_chans) {
     // Initialize coefficients
-    this->fFIRCoeff = fFIRCoeff;
-    this->fIIRCoeff = fIIRCoeff;
-    this->iDelayInSamples = iDelayInSamples;
-    this->iNumChannels = iNumChannels;
+    this->FIR_Coeff = FIR_Coeff;
+    this->IIR_Coeff = IIR_Coeff;
+    this->SampleDelay = SampleDelay;
+    this->Num_chans = Num_chans;
     
-    fFIRDelay = new float *[iNumChannels];
-    fIIRDelay = new float *[iNumChannels];
+    FIR_Delay = new float *[Num_chans];
+    IIR_Delay = new float *[Num_chans];
     
-    for(int n = 0; n < iNumChannels; n++){
-        fFIRDelay[n] = new float[iDelayInSamples];
-        fIIRDelay[n] = new float[iDelayInSamples];
+    for(int n = 0; n < Num_chans; n++){
+        FIR_Delay[n] = new float[SampleDelay];
+        IIR_Delay[n] = new float[SampleDelay];
     }
     
     clearDelayLines();
 }
 
-/* The destructor methods for filterAudio */
-FilterAudio::~FilterAudio() {
-    
+
+FilterAudio::~FilterAudio()     // Destructor for filterAudio //
+{   
     // Free all memory
-    for (int k=0; k<iNumChannels; k++) {
-        delete [] fFIRDelay[k];
-        delete [] fIIRDelay[k];
+    for (int k=0; k < Num_chans; k++) {
+        delete [] FIR_Delay[k];
+        delete [] IIR_Delay[k];
     }
-    delete [] fFIRDelay;
-    delete [] fIIRDelay;
+    delete [] FIR_Delay;
+    delete [] IIR_Delay;
 
 }
 
 /* A method to perform FIR and IIR comb filtering of an input block using the coefficients defined when constructing the filterAudio object. */
-float ** FilterAudio::combFilterBlock(float **fInput, int iBlockSize, int iNumChannels){
+float ** FilterAudio::combFilterBlock(float **fInput, int iBlockSize, int Num_chans){
     
     // Allocate memory for output
-    float **fOutput = new float *[iNumChannels];
+    float **fOutput = new float *[Num_chans];
     
-    for (int i = 0; i < iNumChannels ; i ++)
+    for (int i = 0; i < Num_chans ; i ++)
     {
-        fOutput[i] = new float[iBlockSize];
+        fOutput[i] = new float[BlockSize];
     }
     
-    // Filter each channel
-    for(int i = 0; i<iNumChannels; i++){
+    
+    for(int i = 0; i<Num_chans; i++){    // Filter each channel
         
-        // Perform filtering
-        for(int j = 0; j < iBlockSize; j++){
-            fOutput[i][j] = fInput[i][j] + fFIRCoeff*fFIRDelay[i][iDelayInSamples-1] + fIIRCoeff*fIIRDelay[i][iDelayInSamples-1];
+        
+        for(int j = 0; j < BlockSize; j++){
+            fOutput[i][j] = fInput[i][j] + FIR_Coeff*FIR_Delay[i][SampleDelay-1] + IIR_Coeff*IIR_Delay[i][SampleDelay-1];
             
-            for(int k = iDelayInSamples-1; k>0; k--){
-                fFIRDelay[i][k] = fFIRDelay[i][k-1];
-                fIIRDelay[i][k] = fIIRDelay[i][k-1];
+            for(int k = SampleDelay-1; k>0; k--){
+                FIR_Delay[i][k] = FIR_Delay[i][k-1];
+                IIR_Delay[i][k] = IIR_Delay[i][k-1];
             }
-            fFIRDelay[i][0] = fInput[i][j];
-            fIIRDelay[i][0] = fOutput[i][j];
+            FIR_Delay[i][0] = fInput[i][j];
+            IIR_Delay[i][0] = fOutput[i][j];
         }
         
     }
@@ -65,28 +65,24 @@ float ** FilterAudio::combFilterBlock(float **fInput, int iBlockSize, int iNumCh
 }
 
 
-/* A public method to clear the multichannel delay lines. Sets all values to 0.0 */
-void FilterAudio::clearDelayLines(){
+void FilterAudio::clearDelayLines(){     //clear the multichannel delay lines
     // Initialize delay lines
-    for(int n = 0; n < iNumChannels; n++){
-        for(int k = 0; k < iDelayInSamples; k++){
-            fFIRDelay[n][k] = 0.0;
-            fIIRDelay[n][k] = 0.0;
+    for(int n = 0; n < Num_chans; n++){
+        for(int k = 0; k < SampleDelay; k++){
+            FIR_Delay[n][k] = 0.0;
+            IIR_Delay[n][k] = 0.0;
         }
     }
 }
 
-/* A public method that returns the number of samples in the delay line. */
-int FilterAudio::getDelayInSamples() const{
-    return iDelayInSamples;
+int FilterAudio::getDelayInSamples() const{  //return the number of samples in the delay line
+    return SampleDelay;
 }
 
-/* A public method that returns the FIR gain Coefficient */
-float FilterAudio::getFIRCoeff() const{
-    return fFIRCoeff;
+float FilterAudio::getFIRCoeff() const{     // Return FIR gain coefficient
+    return FIR_Coeff;
 }
 
-/* A public method that returns the IIR gain Coefficient */
-float FilterAudio::getIIRCoeff() const{
-    return fIIRCoeff;
+float FilterAudio::getIIRCoeff() const{     // Return IIR gain coefficient
+    return IIR_Coeff;
 }
