@@ -1,8 +1,8 @@
-#include "FilterAudio.h"
+#include "CombFilter.h"
 #include <iostream>
 
 /* The constructor method for FilterAudio */
-FilterAudio::FilterAudio(float FIR_Coeff, float IIR_Coeff, int SampleDelay, int Num_chans) {
+CombFilter::CombFilter(float FIR_Coeff, float IIR_Coeff, int SampleDelay, int Num_chans) {
     // Initialize coefficients
     this->FIR_Coeff = FIR_Coeff;
     this->IIR_Coeff = IIR_Coeff;
@@ -21,7 +21,7 @@ FilterAudio::FilterAudio(float FIR_Coeff, float IIR_Coeff, int SampleDelay, int 
 }
 
 
-FilterAudio::~FilterAudio()     // Destructor for filterAudio //
+CombFilter::~CombFilter()     // Destructor for filterAudio //
 {   
     // Free all memory
     for (int k=0; k < Num_chans; k++) {
@@ -34,7 +34,7 @@ FilterAudio::~FilterAudio()     // Destructor for filterAudio //
 }
 
 /* A method to perform FIR and IIR comb filtering of an input block using the coefficients defined when constructing the filterAudio object. */
-float ** FilterAudio::combFilterBlock(float **fInput, int iBlockSize, int Num_chans){
+float ** CombFilter::combFilterBlock(float **fInput, int iBlockSize, int Num_chans){
     
     // Allocate memory for output
     float **fOutput = new float *[Num_chans];
@@ -65,7 +65,7 @@ float ** FilterAudio::combFilterBlock(float **fInput, int iBlockSize, int Num_ch
 }
 
 
-void FilterAudio::clearDelayLines(){     //clear the multichannel delay lines
+void CombFilter::clearDelayLines(){     //clear the multichannel delay lines
     // Initialize delay lines
     for(int n = 0; n < Num_chans; n++){
         for(int k = 0; k < SampleDelay; k++){
@@ -75,14 +75,14 @@ void FilterAudio::clearDelayLines(){     //clear the multichannel delay lines
     }
 }
 
-int FilterAudio::getDelayInSamples() const{  //return the number of samples in the delay line
+int CombFilter::getDelayInSamples() const{  //return the number of samples in the delay line
     return SampleDelay;
 }
 
-float FilterAudio::getFIRCoeff() const{     // Return FIR gain coefficient
+float CombFilter::getFIRCoeff() const{     // Return FIR gain coefficient
     return FIR_Coeff;
 }
 
-float FilterAudio::getIIRCoeff() const{     // Return IIR gain coefficient
+float CombFilter::getIIRCoeff() const{     // Return IIR gain coefficient
     return IIR_Coeff;
 }
