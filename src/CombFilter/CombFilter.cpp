@@ -1,7 +1,6 @@
 #include "CombFilter.h"
 #include <iostream>
 
-/* The constructor method for FilterAudio */
 CombFilter::CombFilter(float FIR_Coeff, float IIR_Coeff, int SampleDelay, int Num_chans) {
     // Initialize coefficients
     this->FIR_Coeff = FIR_Coeff;
