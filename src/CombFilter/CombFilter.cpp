@@ -33,7 +33,7 @@ CombFilter::~CombFilter()     // Destructor for filterAudio //
 
 }
 
-/* A method to perform FIR and IIR comb filtering of an input block using the coefficients defined when constructing the filterAudio object. */
+// FIR and IIR implementation //
 float ** CombFilter::combFilterBlock(float **fInput, int BlockSize, int Num_chans){
     
     // Allocate memory for output
