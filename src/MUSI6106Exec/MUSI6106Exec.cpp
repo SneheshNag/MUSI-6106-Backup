@@ -10,6 +10,9 @@ include <iostream>
 using std::cout;
 using std::endl;
 
+int Zero_Input();
+int Diff_Block_Sizes();
+
 // local function declarations
 void    showClInfo ();
 
@@ -72,8 +75,8 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
-    ppfAudioData = new float*[stFileSpec.iNumChannels];
-    for (int i = 0; i < stFileSpec.Num_channels; i++)
+    ppfAudioData = new float*[stFileSpec.Num_chans];
+    for (int i = 0; i < stFileSpec.Num_chans; i++)
         ppfAudioData[i] = new float[kBlockSize];
 
     time = clock();
@@ -81,14 +84,14 @@ int main(int argc, char* argv[])
     // get audio data and write it to the output file
     while (!phAudioFile->isEof())
     {
-        long long iNumFrames = kBlockSize;
-        phAudioFile->readData(ppfAudioData, iNumFrames);
+        long long NumFrames = kBlockSize;
+        phAudioFile->readData(ppfAudioData, NumFrames);
 
         cout << "\r" << "reading and writing";
 
-        for (int i = 0; i < iNumFrames; i++)
+        for (int i = 0; i < NumFrames; i++)
         {
-            for (int c = 0; c < stFileSpec.iNumChannels; c++)
+            for (int c = 0; c < stFileSpec.Num_chans; c++)
             {
                 hOutputFile << ppfAudioData[c][i] << "\t";
             }
@@ -98,23 +101,36 @@ int main(int argc, char* argv[])
 
     cout << "\nreading/writing done in: \t" << (clock() - time)*1.F / CLOCKS_PER_SEC << " seconds." << endl;
 
+float *sinwav(float freq, float amp, float len, int fs){
+
+    float pi = 3.14;
+
+    int lenSamp = ceil(len * fs);
+    float* Sine = new float[lenSamp];
+
+
+    for(int i = 0; i<lengthInSamples; i++){
+        Sine[i] = amp* sin((2.f*pi*freq)/(fs) *i);
+    }
+
+    return Sine;
+}  
         
-        
-    int testZeroInput() {
+ int Zero_Input() {
         CombFilter *pFilter;
         float FIR_Coeff = 1.0;
-        float IIR_Coeff = 0.5;
+        float IIR_Coeff = 0.4;
         int SampleDelay = 10;
         int Num_chans = 1;
         int BlockSize = 1024;
-        int NumBlocks = 50; //Length of sample is 50 blocks
+        int NumBlocks = 30; 
 
         //Allocate memory
         float **ppfAudioData = new float *[Num_chans];
-        for (int n=0; n<Num_chans; n++) {
+        for (int n = 0; n< Num_chans; n++) {
             ppfAudioData[n] = new float[BlockSize];
-            for (int m=0; m<BlockSize; m++) {
-                ppfAudioData[n][m] = 0; //Initialize all samples to zero
+            for (int m = 0; m < BlockSize; m++) {
+                ppfAudioData[n][m] = 0; //Initialize 
             }
         }
     
@@ -125,12 +141,12 @@ int main(int argc, char* argv[])
             //Get filtered data
             ppfAudioData = pFilter->combFilterBlock(ppfAudioData, BlockSize, Num_chans);
 
-            for (int n=0; n<iNumChannels; n++) {
-                for (int m=0; m<iBlockSize; m++) {
+            for (int n = 0; n < Num_chans; n++) {
+                for (int m = 0; m < iBlockSize; m++) {
 
-                    //Check if all the values are 0
-                    if (abs(ppfAudioData[n][m]) > 0.001) {
-                        cout<<"\nZero Input Test: failed!\n";
+                    
+                    if (abs(ppfAudioData[n][m]) > 0) {
+                        cout<<"\nZero Input Test failed\n";
                         return -1;
                     }
                 }
@@ -138,7 +154,6 @@ int main(int argc, char* argv[])
             NumBlocks--;
         }
 
-    cout<<"\nZero Input Test: Success!\n";
     
         //Free memory
         delete pFilter;
@@ -150,6 +165,19 @@ int main(int argc, char* argv[])
     
     return 0;
 }
+        
+int FIR_mag_test() {
+    
+    CombFilter *pComb;
+    float FIR_Coeff = 1.0;
+    float IIR_Coeff = 0.0;
+    int Num_chans = 1;
+    int BlockSize = 500;
+   
+    
+    
+    
+    
     //////////////////////////////////////////////////////////////////////////////
     // clean-up
     CAudioFileIf::destroy(phAudioFile);
