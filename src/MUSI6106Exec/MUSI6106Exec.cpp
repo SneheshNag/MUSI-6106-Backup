@@ -21,7 +21,8 @@ void    showClInfo ();
 int main(int argc, char* argv[])
 {
     std::string             sInputFilePath,                 // file paths
-                            sOutputFilePath;
+                            sOutputFilePath,
+                            sInputFileName, sOutputFileName;
 
     clock_t                 time = 0;
     
