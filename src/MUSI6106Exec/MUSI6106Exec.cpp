@@ -23,14 +23,14 @@ int main(int argc, char* argv[])
     std::string             sInputFilePath,                 // file paths
                             sOutputFilePath;
 
-    static const int        kBlockSize = 1024;
-
     clock_t                 time = 0;
+    
+    CombFilterIf *pCombFilter;
+    
     float FIR_Coeff = 0.0;
     float IIR_Coeff = 0.0;
     float Delay = 0.0;
-    int BlockSize = 2048; //default blockSize
-    bool bOutputResultToTextFile = false; //default
+    int BlockSize = 2048; 
     int iFileOpenStatus;
 
     float                   **ppfAudioData = 0;
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
         FIR_Coeff = atof(argv[3]);
         IIR_Coeff = atof(argv[4]);
 
-
+    fDelayInMSec = atof(argv[5]);
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
     CAudioFileIf::create(phAudioFile);
@@ -63,6 +63,8 @@ int main(int argc, char* argv[])
         return -1;
     }
     phAudioFile->getFileSpec(stFileSpec);
+        
+    CombFilterIf::create(pCombFilter, BlockSize);
 
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
